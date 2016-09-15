@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<meta charset="UTF-8">
+<title>Acceleration Visualizer</title>
+<script src="/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+
+body {
+  background-color: #fff;
+  padding: 30px 30px 30px;
+  font-family: Helvetica, sans-serif;
+}
+
+#temp, #temp2 {
+  text-align: center;
+  font-size: 72px;
+  font-weight: bold;
+  margin: 20px;
+}
+
+h1 {
+  font-size: 18px;
+}
+
+#cooler {
+  display: block;
+  padding: 8px 0;
+  font-size: 30px;
+  text-align: center;
+  width: 100%;
+}
+
+</style>
+<body>
+<h1>My Home Temperature</h1>
+<button id="cooler">Start Cooling</button>
+
+<div id="temp2">0°F</div>
+<div id="temp">0°C</div>
+
+
+<pre id="dump">Loading...</pre>
+</body>
+<script>
+
+function avg(arr) {
+  var res = 0;
+  for (var i = 0; i < arr.length; i++) {
+    res += arr[i];
+  }
+  return res / arr.length;
+}
+
+var vec = [];
+
+function addData(data) {
+  var trail = 3;
+
+  vec.push(data.fahrenheit);
+  vec = vec.slice(-trail);
+
+  return avg(vec);
+}
+
+$('#cooler').on('click', function () {
+  $.post("/api/cool", function () {
+    console.log('done');
+    $('#cooler').attr('disabled', true).text('Cooling...');
+  }).fail(function() {
+    console.log('failed');
+    $('#cooler').attr('disabled', true).text('failed!!!!!!!!');
+  })
+})
+
+var source = new EventSource('/api/temperature');
+
+source.addEventListener('message', function(e) {
+  document.querySelector('#dump').innerText = e.data;
+  // document.querySelector('#dump').innerText = JSON.stringify(vec);
+
+  var f = addData(JSON.parse(e.data)) - 8;
+  var c = (f - 32) * (5 / 9);
+  document.querySelector('#temp2').innerText = f.toFixed(1) + "°F";
+  document.querySelector('#temp').innerText = c.toFixed(1) + "°C";
+}, false);
+
+</script>
+</html>

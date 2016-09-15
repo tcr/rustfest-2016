@@ -1,0 +1,13 @@
+[package]
+name = "fanremote"
+version = "0.1.0"
+authors = ["Tim Ryan <id@timryan.org>"]
+publish = false
+
+[dependencies]
+nickel = "0.8.1"
+rustc-serialize = "0.3"
+tessel = "0.3"
+climate-si7020 = "0.1"
+local-ip = "0.1"
+relay-mono = "0.1"

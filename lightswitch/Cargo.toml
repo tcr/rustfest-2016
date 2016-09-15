@@ -1,0 +1,9 @@
+[package]
+name = "lightswitch"
+version = "0.1.0"
+authors = ["Tim Ryan <id@timryan.org>"]
+
+[dependencies]
+ble = "0.1.1"
+tessel = "0.3"
+servo-pca9685 = "0.1"
