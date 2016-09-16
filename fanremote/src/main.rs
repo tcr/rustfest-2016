@@ -1,4 +1,4 @@
-// Needed for execution on Tessel.
+// Required (for now) to compile programs that run on Tessel.
 #![feature(alloc_system)]
 extern crate alloc_system;
 
@@ -7,17 +7,18 @@ extern crate climate_si7020;
 extern crate local_ip;
 extern crate relay_mono;
 extern crate rustc_serialize;
+// Crate for the Tessel microcontroller.
 extern crate tessel;
 
 use climate_si7020::Climate;
 use nickel::{Nickel, HttpRouter, MediaType, Options};
+use relay_mono::RelayArray;
 use rustc_serialize::json;
-use std::sync::Mutex;
-use tessel::Tessel;
 use std::io::prelude::*;
+use std::sync::Mutex;
 use std::thread;
 use std::time::Duration;
-use relay_mono::RelayArray;
+use tessel::Tessel;
 
 #[derive(RustcDecodable, RustcEncodable)]
 struct Measurement {
@@ -57,6 +58,7 @@ fn main() {
         JQUERY_JS
     });
 
+    // A POST request turns on both relay channels.
     server.post("/api/cool", middleware! { |_, mut res|
         let mut relays = latches.lock().unwrap();
         relays.set_latch(1, true);
@@ -64,6 +66,7 @@ fn main() {
         r#"{"success": true}"#
     });
 
+    // Send temperature readings to the browser as JSON.
     server.get("/api/temperature", middleware! { |_, mut res|
         res.headers_mut().set_raw("content-type", vec!["text/event-stream".as_bytes().to_vec()]);
 
